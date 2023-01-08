@@ -9,7 +9,7 @@
         
         <form action="{% url 'djangoapp:registration' %}" method="post">
             {% csrf_token %}
-            <div class="container">
+            <div class="container bg-warning text-dark">
                 <h2>Sign Up</h2>
                 <div class="form-group"> <!--Style second div with .form-group class -->
                     <label for="username"><b>User Name</b></label>
@@ -25,7 +25,7 @@
                         {{ message }}
                     </div>
                     {% endif %}
-                    <button class="btn btn-warning" type="submit">Sign up</button> <!--Style button with .btn and .btn-primary class -->
+                    <button class="btn btn-dark" type="submit">Sign up</button> <!--Style button with .btn and .btn-primary class -->
                 </div>
             </div>
         </form>
