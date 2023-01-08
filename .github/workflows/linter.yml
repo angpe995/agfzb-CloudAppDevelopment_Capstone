@@ -47,7 +47,7 @@ jobs: # list of things to do
         working-directory: functions/sample/python
 
   lint_django_server:
-    name: Linting Django Server 
+    name: Linting Django Server  
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
