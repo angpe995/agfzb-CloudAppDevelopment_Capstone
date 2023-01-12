@@ -8,6 +8,11 @@
 </head>
 
     <body>
+        {% for review in reviews %}
+                {% if review.car_make %}
+                        <p class="card-text" style="text-align: left;">{{ review.review }}</p>
+                    {%endif%}
+            {%endfor%}
 
     <!--Add a nav bar here -->
 
