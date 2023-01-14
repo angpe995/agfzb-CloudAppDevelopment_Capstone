@@ -3,7 +3,7 @@ import json
 # import related models here
 from ibm_watson import NaturalLanguageUnderstandingV1
 from ibm_watson.natural_language_understanding_v1 \
-    import Features, SemanticRolesOptions,EntitiesOptions
+    import Features, SemanticRolesOptions,EntitiesOptions,SentimentOptions
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from requests.auth import HTTPBasicAuth
 from .models import CarDealer,DealerReview
@@ -55,28 +55,33 @@ def get_dealer_reviews_from_cf(url, id):
     results = []
     # Perform a GET request with the specified dealer id
     json_result = get_request(url, id=id)
+    car_make=None
+    car_model=None
+    car_year=None
+    purchase=False
+    purchase_date=None
     if json_result:
-        #print(json_result)
-        # Get all review data from the response
         reviews = json_result["data"]["docs"]
-        # For every review in the response
         for review in reviews:
-            # Create a DealerReview object from the data
-            # These values must be present
+            purchase = review["purchase"]
+            
             review_content = review["review"]
             id = review["id"]
             name = review["name"]
-            purchase = review["purchase"]
             dealership = review["dealership"]
-            car_make = review["car_make"]
-            car_model = review["car_model"]
-            car_year = review["car_year"]
-            purchase_date = review["purchase_date"]
-            review_obj = DealerReview(id=id, name=name, dealership=dealership, review=review_content, sentiment=None, purchase=purchase, purchase_date=purchase_date, car_make=car_make, car_model=car_model, car_year=car_year)
+            if "car_make" in review:
+                car_make = review["car_make"]
+            if "car_model" in review:
+                car_model = review["car_model"]
+            if "car_year" in review:
+                car_year = review["car_year"]
+            sentiment=analyze_review_sentiments(review["review"])
+            if purchase==True:
+                purchase_date = review["purchase_date"]
+            review_obj = DealerReview(id=id, name=name, dealership=dealership, review=review_content, sentiment=sentiment, purchase=purchase, purchase_date=purchase_date, car_make=car_make, car_model=car_model, car_year=car_year)
             results.append(review_obj)
-            review_obj.sentiment = analyze_review_sentiments(review_obj.review)
+        print(results)
     return results
-
 def get_dealer_by_id(url, dealerId, **kwargs):
     results = []
     json_result = get_request(url)
@@ -93,7 +98,6 @@ def get_dealer_by_id(url, dealerId, **kwargs):
             dealerid=dealer_obj.id
             if(dealerid==dealerid):
                 results.append(dealer_obj)
-
     return results 
 def get_dealer_by_id_from_cf(url, id):
     json_result = get_request(url, id=id)
@@ -109,15 +113,12 @@ def get_dealer_by_id_from_cf(url, id):
 # e.g., response = requests.post(url, params=kwargs, json=payload)
 
 def analyze_review_sentiments(dealerreview):
-    print(dealerreview)
-    print(dealerreview)
-    print(dealerreview)
     api_key = IAMAuthenticator('7hONHM3lp4AbHSvUJ0Ii41uz0oDy01nciohO6U8Xmtk7')
     natural_language_understanding = NaturalLanguageUnderstandingV1(version='2022-04-07', authenticator=api_key)
     natural_language_understanding.set_service_url('https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/fc516d31-284d-4459-86d1-9804557e72bd')
-    response = natural_language_understanding.analyze(text=dealerreview,features=Features(entities=EntitiesOptions(sentiment=True,limit=1))).get_result()
-    print(response["entities"]) 
-    return response["entities"]
+    response = natural_language_understanding.analyze(text=dealerreview, features=Features(sentiment=SentimentOptions())).get_result()
+    print(response['sentiment']['document']['label'])
+    return response['sentiment']['document']['label']
 # Create a get_dealers_from_cf method to get dealers from a cloud function
 # ef get_dealers_from_cf(url, **kwargs):
 # - Call get_request() with specified arguments

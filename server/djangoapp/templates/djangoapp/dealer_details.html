@@ -10,7 +10,7 @@
     <body>
         {% for review in reviews %}
                 {% if review.car_make %}
-                        <p class="card-text" style="text-align: left;">{{ review.review }}</p>
+                        <p class="card-text" style="text-align: left;">{{ review.sentiment }}</p>
                     {%endif%}
             {%endfor%}
 
