@@ -11,7 +11,11 @@ from .models import CarDealer,DealerReview
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
 #                                     auth=HTTPBasicAuth('apikey', api_key))
-
+def post_request(url, json_payload, **kwargs):
+    response = requests.post(url, params = kwargs,json=json_payload)
+    status_code = response.status_code
+    print("With status {} ".format(status_code))
+    return response
 def get_request(url, **kwargs):
     print(kwargs)
     api_key=kwargs.get("api_key")
@@ -104,11 +108,11 @@ def get_dealer_by_id_from_cf(url, id):
     print('json_result from line 54', json_result)
     if json_result:
         dealers = json_result[0]
-    print("line 70 restapis",json_result)
-    dealer_doc = dealers
-    print("0th address element line 73", dealers["address"])
-    dealer_obj = CarDealer(address=dealers["address"], city=dealers["city"],id=dealers["id"], lat=dealers["lat"], long=dealers["long"], full_name=dealers["full_name"],short_name=dealers["short_name"], st=dealers["st"], zip=dealers["zip"])
-    return dealer_obj
+        print("line 70 restapis",json_result)
+        dealer_doc = dealers
+        print("0th address element line 73", dealers["address"])
+        dealer_obj = CarDealer(address=dealers["address"], city=dealers["city"],id=dealers["id"], lat=dealers["lat"], long=dealers["long"], full_name=dealers["full_name"],short_name=dealers["short_name"], st=dealers["st"], zip=dealers["zip"])
+        return dealer_obj
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
 
